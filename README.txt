@@ -1,0 +1,1 @@
+This is the beginnings of an app that will be capable of simulating a chess game. Currently, it is just pawns. This was developed in Ruby using rspec. 
