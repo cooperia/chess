@@ -1,3 +1,4 @@
+#Game
 class Game
   def initialize
     @whiteArray = []
@@ -21,12 +22,14 @@ class Game
   
   
   def getPieceById(id, color)
+    #get white piece
     if color == 'white'
       @whiteArray.each { |x|
         if x.id == id
           return x
         end
       }
+      #get black piece
     else
       @blackArray.each { |x|
         if x.id == id
@@ -62,13 +65,14 @@ class Game
   end
 end
 
+#Piece
 class Piece
   attr_accessor :position
   attr_accessor :color
   attr_accessor :id
   
   
-  #initialize variables that will be relevant for all pieces
+  #initialize variables that will be relevant for types of piece
   def initialize(id, start, color)
     self.position = start
     self.color = color
@@ -76,7 +80,7 @@ class Piece
   end
 end
 
-#Pawn Class
+#Pawn
 class Pawn < Piece
   def type
     @type = 'pawn'
@@ -90,6 +94,7 @@ class Pawn < Piece
       return false
     end
     
+    #populate the moveArray with possible desinations (this will make more sense in the context of other piece types)
     #handle white
     if self.color == 'white'
       if self.position[1] != 2
@@ -98,7 +103,7 @@ class Pawn < Piece
         @move_array = @move_array.reject { |x| x[1] > 8 or x[1] < 2 }
       else
         #start position moveArray
-        #make sure there are no obstructions, if there are, don't bother
+        #make sure there are no obstructions, if there are, don't bother continuing
         if frArray.any?{|x| x.position == [self.position[0], 3]} or opArray.any?{|x| x.position == [self.position[0], 3]}
           return false
         end
@@ -114,15 +119,16 @@ class Pawn < Piece
         @move_array = @move_array.reject { |x| x[1] > 7 or x[1] < 1 }
       else
         #start position moveArray
-        #make sure there are no obstructions, if there are, don't bother
+        #make sure there are no obstructions, if there are, don't bother continuing
         if frArray.any?{|x| x.position == [self.position[0], 6]} or opArray.any?{|x| x.position == [self.position[0], 6]}
           return false
         end
         @move_array = [[self.position[0], self.position[1]-1], [self.position[0], self.position[1]-2]]
       end
     end
+    
+    #verify that dest exists within moveArray and return true
     if @move_array.include? dest
-      
       return true
     end
     return false
@@ -130,7 +136,7 @@ class Pawn < Piece
   
   
   def checkCapture (dest, opArray)
-    #Make sure this is a valid capture
+    #Make sure this is a valid position to capture
     if self.color == 'white'
       if dest[1] != self.position[1]+1
         return false
@@ -152,7 +158,7 @@ class Pawn < Piece
   
   
   def move(dest, opArray, frArray)
-    #determine which check to run
+    #determine which check to run and call it
     if self.position[0] == dest[0]
       if self.checkMove(dest, opArray, frArray)
         self.position = dest
@@ -168,10 +174,5 @@ class Pawn < Piece
         return 'Not Valid'
       end
     end 
-  end
-
-
-  def listArray
-    @move_array 
   end
 end
