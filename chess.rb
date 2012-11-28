@@ -1,178 +1,104 @@
 #Game
 class Game
+  attr_reader :pieces
+  
   def initialize
-    @whiteArray = []
-    @blackArray = []
-    #fill arrays with pawns
+    @pieces = []
     for i in 1..8
-      @whiteArray.push(Pawn.new(i, [i,2], 'white'))
-      @blackArray.push(Pawn.new(i, [i,7], 'black'))
+      @pieces.push(Pawn.new(:position => [i,2], :color => 'white'))
+      @pieces.push(Pawn.new(:position => [i,7], :color => 'black'))
     end
   end
   
-  
-  def whiteArray
-    @whiteArray
-  end
-  
-  
-  def blackArray
-    @blackArray
-  end
-  
-  
-  def getPieceById(id, color)
-    #get white piece
-    if color == 'white'
-      @whiteArray.each { |x|
-        if x.id == id
-          return x
-        end
-      }
-      #get black piece
-    else
-      @blackArray.each { |x|
-        if x.id == id
-          return x
-        end
-      }
-    end
-  end
-  
-  
-  def movePiece(id, color, dest)
-    #make sure dest is on the board
-    if dest[0].between?(1,8) and dest[1].between?(1,8)
-      piece = self.getPieceById(id, color)
-      
-      if color == 'white'
-        #handle white moves
-        if @whiteArray.any? {|x| x.position == dest}
-          return 'Not Valid(friendly)'
-        end
-        return piece.move(dest, @blackArray, @whiteArray)
-      else
-        #handle black moves
-        if @blackArray.any? {|x| x.position == dest}
-          return 'Not Valid(friendly)'
-        end
-        return piece.move(dest, @whiteArray, @blackArray)
-      end
-    end
-    
-    #if not on the board, return 'Not Valid(overboard)'
-    return 'Not Valid(overboard)'
+  def move_piece(position, dest)
+    piece = pieces.select { |x| x.position == position}
+    piece[0].move(dest, pieces)
   end
 end
 
 #Piece
 class Piece
-  attr_accessor :position
-  attr_accessor :color
-  attr_accessor :id
+  attr_reader :position, :color, :start
   
+  def initialize(args)
+    @position = args[:position]
+    @color = args[:color]
+    @start = true
+  end
   
-  #initialize variables that will be relevant for types of piece
-  def initialize(id, start, color)
-    self.position = start
-    self.color = color
-    self.id = id
+  def check_position_vacancy?(dest, pieces)
+    !pieces.any? { |x| x.position == dest} 
+  end
+  
+  def check_occupant_color(dest, pieces)
+    piece = pieces.select { |x| x.position == dest}
+    piece[0].color
+  end
+  
+  def check_move_validity?(dest)
+    if (1..8).include?(dest[0]) && (1..8).include?(dest[1]) 
+      true
+    else
+      false
+    end
   end
 end
 
 #Pawn
 class Pawn < Piece
-  def type
-    @type = 'pawn'
-  end
   
-  
-  #check possible moves, ignores captures. Only Relevant to pawns.
-  def checkMove (dest, opArray, frArray)
-    #check to make sure there aren't any pieces at the destination
-    if frArray.any?{|x| x.position == dest} or opArray.any?{ |x| x.position == dest}
-      return false
-    end
-    
-    #populate the moveArray with possible desinations (this will make more sense in the context of other piece types)
-    #handle white
-    if self.color == 'white'
-      if self.position[1] != 2
-        #everywhere other than start
-        @move_array = [[self.position[0], self.position[1]+1]]
-        @move_array = @move_array.reject { |x| x[1] > 8 or x[1] < 2 }
-      else
-        #start position moveArray
-        #make sure there are no obstructions, if there are, don't bother continuing
-        if frArray.any?{|x| x.position == [self.position[0], 3]} or opArray.any?{|x| x.position == [self.position[0], 3]}
-          return false
-        end
-        @move_array = [[self.position[0], self.position[1]+1], [self.position[0], self.position[1]+2]]
-        
-      end
-     
-    #handle black  
+  def check_double_move?(pieces)
+    if check_position_vacancy?([position[0], 3], pieces) && check_position_vacancy?([position[0], 4], pieces)
+      true
     else
-      if self.position[1] != 7
-        #everywhere other than start
-        @move_array = [[self.position[0], self.position[1]-1]]
-        @move_array = @move_array.reject { |x| x[1] > 7 or x[1] < 1 }
-      else
-        #start position moveArray
-        #make sure there are no obstructions, if there are, don't bother continuing
-        if frArray.any?{|x| x.position == [self.position[0], 6]} or opArray.any?{|x| x.position == [self.position[0], 6]}
-          return false
+      false
+    end
+  end  
+  
+  def check_move_legality?(dest, pieces)
+    if start && dest[1] == 4
+      check_double_move?(pieces) 
+    elsif dest[1] == position[1]+1
+      check_position_vacancy?(dest, pieces)
+    else
+      false
+    end
+  end
+  
+  def check_capture_legality?(dest)
+    if dest == [position[0]+1, position[1]+1] || dest == [position[0]+1, position[1]-1]
+      true
+    else
+      false
+    end
+  end
+  
+  def check_capture?(dest, pieces)
+    if check_capture_legality?(dest) && !check_position_vacancy?(dest, pieces) && check_occupant_color(dest, pieces) != color
+      true
+    else
+      false
+    end
+  end
+  
+  def move(dest, pieces)
+    if check_move_validity?(dest)
+      if dest[0] != position[0]
+        if check_capture?(dest, pieces)
+          pieces.delete_if { |x| x.position == dest }
+          start = false
+          position = dest
+        else
+          "Illegal Capture"
         end
-        @move_array = [[self.position[0], self.position[1]-1], [self.position[0], self.position[1]-2]]
-      end
-    end
-    
-    #verify that dest exists within moveArray and return true
-    if @move_array.include? dest
-      return true
-    end
-    return false
-  end
-  
-  
-  def checkCapture (dest, opArray)
-    #Make sure this is a valid position to capture
-    if self.color == 'white'
-      if dest[1] != self.position[1]+1
-        return false
-      end
-    else 
-      if dest[1] != self.position[1]-1
-        return false
-      end
-    end
-    #make sure there is an opposing piece at destination
-    opArray.each { |x|
-      if x.position == dest
-          opArray.delete(x)
-        return true
-      end
-    }
-    return false
-  end
-  
-  
-  def move(dest, opArray, frArray)
-    #determine which check to run and call it
-    if self.position[0] == dest[0]
-      if self.checkMove(dest, opArray, frArray)
-        self.position = dest
-        return 'Moved!'
-      else 
-        return 'Not Valid'
+      elsif check_move_legality?(dest, pieces)
+        start = false
+        position = dest
+      else
+        "Illegal Move"
       end
     else
-      if self.checkCapture(dest, opArray)
-        self.position = dest
-        return 'Capture!'
-      else
-        return 'Not Valid'
-      end
-    end 
+      "Invalid Destination"
+    end
   end
 end
