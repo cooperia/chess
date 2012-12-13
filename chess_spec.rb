@@ -7,53 +7,55 @@ describe Game do
   let(:pieces) { Pieces.new }
   let(:game) { Game.new(pieces) }
   
-  it 'has pieces' do 
-    game.pieces
-  end
-  
-  describe '#new' do
-    it "Starts a game" do
-      game.pieces == pieces
-      end
-  end
-  
-  describe '#move_piece' do
+  describe '#move' do
     it "accepts a hash containing position and destination returns true if valid move" do
-      # current_position = game.move_piece({:current_position => ['A',1], :destination => ['A', 2]})
-      # current_position[:current_position].should eq(['A',1])
-      # current_position[:destination].should eq(['A',2])
+      expect { game.move(['A',1], ['Z',1])}.to raise_error(RuntimeError, 'Invalid destination')
+      
       # piece = mock('Piece').stub(:move?).and_return true
       #       
       #       pieces = Pieces.new([piece])
       #       Game.new(pieces)
       #       
     end
+    
+    it 'returns capture if destination is occupied' do
+      game.move(['A',1], ['B',1]).should == 'capture'
+    end
+    
+    it 'return move if destination is vacant' do
+      game.move(['A', 1], ['B',2]).should == 'move'
+    end
+    
+    it 'returns No piece there! if moving_piece is nil' do
+      expect { game.move(['C', 1], ['B',2])}.to raise_error(RuntimeError, 'No piece there!')
+    end
   end
   
-  
+  describe '#valid_destination?' do
+    it 'accepts a destination and determines if it is on the board' do
+      game.valid_destination?(['A',1]).should == true
+      game.valid_destination?(['Z',1]).should == false
+    end
+  end
+
 end
 
 describe Pieces do
   let(:pieces) { Pieces.new }
   let(:current_piece) {pieces.collection[0]}
-  let(:dest) {['A',2]}
+
   
-  describe '#new' do
-    it "creates a collection array" do
-      pieces.collection[0].should == current_piece
-      
+  describe '#find_at' do
+    it 'finds a piece by its position' do
+      pieces.find_at(['A',1]).should == current_piece
+      pieces.find_at(['B',1]).should_not == current_piece
     end
   end
   
-  describe '#find_piece_by_position' do
-    it 'finds a piece from current position' do
-      pieces.find_piece_by_position(['A',1]).should == current_piece
-    end
-  end
-  
-  describe '#check_destination_vacancy?' do
+  describe '#vacancy?' do
     it 'checks the vacancy of a destination' do
-      pieces.check_destination_vacancy?(dest).should == ['A',2]
+      pieces.vacancy?(['A',2]).should == true
+      pieces.vacancy?(['A',1]).should == false
     end
   end
 end
@@ -69,13 +71,64 @@ describe Piece do
   
   describe '#capture?' do
     it "checks if a destination is a legal capture" do
-      piece.capture?('destination').should == false
+      piece.capture?('destination').should == 'capture'
     end
   end
   
   describe '#move?' do
     it "checks if a destination is a legal move" do
-      piece.move?('destination').should == true
+      piece.move?('destination').should == 'move'
     end
   end
+end
+
+describe Rook do
+  let(:rook) { Rook.new(['H',1]) }
+
+  describe "#new" do
+    it "creates new rook and accepts position attribute" do
+      rook.position.should == ['H', 1]
+    end
+  end
+
+  describe '#capture?' do
+    it 'calls #move? and returns move' do
+      rook.capture?('dummy') .should == 'move'
+    end
+
+    it 'returns move' do
+      rook.move?('dummy') .should == 'move'
+    end
+  end
+
+  describe "#check_destination_allowed" do
+    it "should return false if destination is not in allowed moves" do
+      rook.check_destination_allowed?(['H', 1],[ ['A',1], ['B',1]]).should == false
+      rook.check_destination_allowed?(['A', 1],[ ['A',1], ['B',1]]).should == true
+    end
+  end
+end
+
+describe RookRules do
+  let(:rules) { RookRules.new }
+
+  describe '#generate_moves' do
+    it 'takes a position and generates an array of possible moves' do
+      moves = rules.generate_moves(['A',1])
+      moves.each do |entry|
+        entry.should_not == ['A', 1]
+      end
+      moves.empty?.should == false
+    end
+  end
+
+  describe '#generate_moves' do
+    it 'takes a position and generates an array of possible moves' do
+
+      allowed_moves = [['A',2], ['A',3], ['A',4], ['A',5], ['A',6], ['A',7], ['A',8], ['B',1], ['C',1], ['D',1], ['E',1], ['F',1], ['G',1], ['H',1]]
+      rules.generate_moves(['A',1]) =~ allowed_moves
+      rules.generate_moves(['A',1]).length.should == allowed_moves.length
+    end
+  end
+
 end
