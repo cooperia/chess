@@ -1,0 +1,1 @@
+t.cucumber_opts = ['--format', "Teamcity::Cucumber:Formatter", "--expand"]
