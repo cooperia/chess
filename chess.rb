@@ -8,10 +8,18 @@ class Game
   def move(position, destination)
 
     moving_piece = pieces.find_at(position)
-    dest_vacancy = pieces.vacancy?(destination)
 
-    error_catcher(moving_piece, destination)
+    error_catcher( moving_piece, destination)
 
+    router(pieces.vacancy?(destination), moving_piece, destination)
+  end
+
+  def error_catcher(moving_piece, destination)
+    !pieces.valid_coordinates?(destination) ? raise('Invalid destination') : true
+    !moving_piece ? raise('No piece there!') : true
+  end
+
+  def router(dest_vacancy, moving_piece, destination)
     if dest_vacancy
       moving_piece.move?(destination)
     else
@@ -19,9 +27,8 @@ class Game
     end
   end
 
-  def error_catcher(moving_piece, destination)
-    !pieces.valid_coordinates?(destination) ? raise('Invalid destination') : true
-    !moving_piece ? raise('No piece there!') : true
+  def test
+    pieces.find_at('berkin')
   end
   
 end
@@ -29,8 +36,10 @@ end
 class Pieces
   attr_accessor :collection
 
+  #Piece.new('type', ['A',1]), Piece.new('type', ['B',1])
+
   def initialize
-    @collection = [Piece.new('type', ['A',1]), Piece.new('type', ['B',1])]
+    @collection = []
   end
 
   #def [](position)
@@ -38,12 +47,12 @@ class Pieces
   #end
 
   def place(type, position)
+    position = Coordinate.new(position)
     error_catcher(type, position)
-    @collection.push(Piece.new(type, position))
+    @collection.push([type, position])
     @collection.last()
   end
 
-  #-TODO:Check if position occupied
   def error_catcher(type, position)
     !valid_type?(type) ? raise('Invalid type') : true
     !valid_coordinates?(position) ? raise('Invalid position') : true
@@ -51,21 +60,21 @@ class Pieces
   end
 
   def valid_type?(type)
-    types = ['type', 'rook']
+    types = ['type', 'rook', 'pawn']
     types.include?(type)
   end
 
   def valid_coordinates?(coordinates)
-    coordinates[0].between?('A', 'H') && coordinates[1].between?(1, 8)
+    coordinates.x.between?('A', 'H') && coordinates.y.between?(1, 8)
   end
   
   def find_at(position)
-    @collection.find {|piece| piece.position == position}
+    @collection.find {|piece| piece[1].eql?(position)}
   end
   
   def vacancy?(destination)
      truth = @collection.select do |piece|
-       piece.position == destination 
+       piece[1].eql?(destination)
     end
     truth.empty?
   end
@@ -126,12 +135,20 @@ class RookRules
   end
 end
 
-class Coordinates
+
+#NEW STUFF
+
+class Coordinate
   attr_accessor :x, :y
 
   def initialize(coordinates)
+    coordinates = coordinates.split('')
     @x = coordinates[0]
-    @y = coordinates[1]
+    @y = coordinates[1].to_i
+  end
+
+  def eql?(arg)
+    arg.x == @x && arg.y == @y
   end
 
 end
@@ -141,8 +158,20 @@ class Move
   attr_accessor :position, :destination
 
   def initialize(position, destination)
-    @position = Coordinates.new(position)
-    @destination = Coordinates.new(destination)
+    @position = Coordinate.new(position)
+    @destination = Coordinate.new(destination)
+  end
+
+end
+
+class MoveFactory
+
+  def generate_move(move, type)
+    type = titleize(type)+'Rules'
+  end
+
+  def titleize(string)
+    new_string = string.slice(0,1).capitalize + string.slice(1..-1)
   end
 
 end

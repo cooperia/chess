@@ -19,7 +19,6 @@ GEM
     rspec-expectations (2.12.0)
       diff-lcs (~> 1.1.3)
     rspec-mocks (2.12.0)
-    test-unit (2.5.3)
 
 PLATFORMS
   ruby
@@ -27,4 +26,3 @@ PLATFORMS
 DEPENDENCIES
   cucumber
   rspec
-  test-unit

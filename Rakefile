@@ -1,15 +1,21 @@
+require 'cucumber/rake/task'
+require 'rspec/core/rake_task'
 
-
-#begin
-#    require 'cucumber/rake/task'
-#      Cucumber::Rake::Task.new(:features)
-#rescue LoadError
-#    puts "Cucumber is not available. In order to run features, you must: sudo gem install cucumber"
-#end
-
-task :default do
-  $:.unshift(File.dirname(__FILE__) + '/../../lib')
-  require 'cucumber/rake/task'
-
-  Cucumber::Rake::Task.new
+desc 'Run my cucumber'
+task :cucumber do
+  Cucumber::Rake::Task.new(:cucumber)
 end
+
+desc 'Run my Spec'
+task :spec do
+  RSpec::Core::RakeTask.new(:spec)
+end
+
+task :default => [:all]
+
+desc 'Run everything'
+task :all do
+  RSpec::Core::RakeTask.new(:all)
+  Cucumber::Rake::Task.new(:all)
+end
+
