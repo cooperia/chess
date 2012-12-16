@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'rspec'
-require '/Users/jasmina/Documents/Ruby/chess2/chess.rb'
+require '/Users/ian/chess/chess.rb'
 require 'cucumber'
 
 describe Piece do

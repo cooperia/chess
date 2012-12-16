@@ -6,63 +6,81 @@ class Game
   end
   
   def move(position, destination)
+    new_move = moveifier(position, destination)
+    pieces.move(new_move)
 
-    moving_piece = pieces.find_at(position)
-
-    error_catcher( moving_piece, destination)
-
-    router(pieces.vacancy?(destination), moving_piece, destination)
+    #moving_piece = pieces.find_at(position)
+    #
+    #error_catcher( moving_piece, destination)
+    #
+    #router(pieces.vacancy?(destination), moving_piece, destination)
   end
 
-  def error_catcher(moving_piece, destination)
-    !pieces.valid_coordinates?(destination) ? raise('Invalid destination') : true
-    !moving_piece ? raise('No piece there!') : true
+  def moveifier(position, destination)
+    Move.new(position, destination)
   end
 
-  def router(dest_vacancy, moving_piece, destination)
-    if dest_vacancy
-      moving_piece.move?(destination)
-    else
-      moving_piece.capture?(destination)
-    end
-  end
-
-  def test
-    pieces.find_at('berkin')
-  end
+  #def error_catcher(moving_piece, destination)
+  #  !pieces.valid_coordinates?(destination) ? raise('Invalid destination') : true
+  #  !moving_piece ? raise('No piece there!') : true
+  #end
+  #
+  #def router(dest_vacancy, moving_piece, destination)
+  #  if dest_vacancy
+  #    moving_piece.move?(destination)
+  #  else
+  #    moving_piece.capture?(destination)
+  #  end
+  #end
+  #
+  #def test
+  #  pieces.find_at('berkin')
+  #end
   
 end
 
 class Pieces
   attr_accessor :collection
 
-  #Piece.new('type', ['A',1]), Piece.new('type', ['B',1])
-
   def initialize
     @collection = []
+    @move_factory = MoveFactory.new
   end
 
-  #def [](position)
-  #
-  #end
+  def move(move)
+    move_error_catcher(move)
+    vacancy?(move.destination) ? true : 'capture'
+    piece = find_at(move.position)
+    @move_factory.generate_move(move, piece[0].type)
 
-  def place(type, position)
+  end
+
+  def path_check?(path)
+    path.each do |position|
+       vacancy?(position) ? true : raise('Path obstructed')
+    end
+    true
+  end
+
+  def place(type, color, position)
     position = Coordinate.new(position)
-    error_catcher(type, position)
-    @collection.push([type, position])
+    place_error_catcher(position)
+    @collection.push([Piece.new(type, color), position])
     @collection.last()
   end
 
-  def error_catcher(type, position)
-    !valid_type?(type) ? raise('Invalid type') : true
-    !valid_coordinates?(position) ? raise('Invalid position') : true
+  def place_error_catcher(position)
+    !valid_coordinates?(position) ? raise('Invalid Position') : true
+    #!valid_coordinates?(move.destination) ? raise('Invalid Destination') : true
     find_at(position) ? raise('Position occupied') : true
   end
 
-  def valid_type?(type)
-    types = ['type', 'rook', 'pawn']
-    types.include?(type)
+  def move_error_catcher(move)
+    !find_at(move.position) ? raise('No piece at position') : true
+    !valid_coordinates?(move.destination) ? raise('Invalid Destination') : true
   end
+
+
 
   def valid_coordinates?(coordinates)
     coordinates.x.between?('A', 'H') && coordinates.y.between?(1, 8)
@@ -81,25 +99,30 @@ class Pieces
 end
 
 class Piece
-  attr_accessor :type, :position
+  attr_reader :type, :color
   
-  def initialize(type, position)
+  def initialize(type, color)
+    error_catcher(type, color)
     @type = type
-    @position = position
-  end
-  
-  def capture?(dest)
-    'capture'
-  end
-  
-  def move?(dest)
-    'move'
+    @color = color
   end
 
-  def legal_destination?(destination, allowed_moves)
-    allowed_moves.include?(destination)
+  def error_catcher(type, color)
+    !valid_type?(type) ? raise('Invalid type') : true
+    !valid_color?(color) ? raise('Invalid color') : true
   end
 
+  private
+
+  def valid_color?(color)
+    colors = ['black', 'white']
+    colors.include?(color)
+  end
+
+  def valid_type?(type)
+    types = ['type', 'rook', 'pawn']
+    types.include?(type)
+  end
 end
 
 class Rook
@@ -121,17 +144,29 @@ end
 
 class RookRules
 
+  def generate_path(move)
+    moves = generate_moves(move.position)
+    if valid_move?(moves, move.destination)
+
+    else
+      raise('Invalid move for a rook')
+    end
+  end
+
+
   def generate_moves(position)
-     x = position[0]
-     y = position[1]
      possible_moves = []
      letter = 'A'
     1.upto(8) do |i|
-      possible_moves.push([x,i])
-      possible_moves.push([letter,y])
+      possible_moves.push(Coordinate.new(position.x.to_s+i.to_s))
+      possible_moves.push(Coordinate.new(letter+position.y.to_s))
       letter = letter.next
     end
-     possible_moves = possible_moves.reject{ |allowed| allowed == position }
+     possible_moves = possible_moves.reject{ |allowed| allowed.eql?(position) }
+  end
+
+  def valid_move?(valid_moves, destination)
+    valid_moves.find { |move| move.eql?(destination)} ? true : false
   end
 end
 
@@ -160,6 +195,10 @@ class Move
   def initialize(position, destination)
     @position = Coordinate.new(position)
     @destination = Coordinate.new(destination)
+  end
+
+  def eql?(other)
+    other.position.eql?(@position) &&  other.destination.eql?(@destination)
   end
 
 end
