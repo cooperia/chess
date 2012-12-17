@@ -1,10 +1,19 @@
-Given /^A Rook at A1$/ do
+Given /^a board$/ do
   @board = Pieces.new
-  @rook = @board.place('rook', 'black', 'A1')
+  @rook = []
 end
-When /^I move the rook to B1$/ do
-  @board.move(Move.new('A1', 'B1'))
+
+Given /^A (.*) (.*) at (.*)$/ do |color, piece, position|
+  @rook.push(@board.place(piece, color, position))
 end
-Then /^The rook is moved to B1$/ do
-  @board.find_at(Coordinate.new('B1'))[0].should == @rook[0]
+
+When /^I move the (.*) from (.*) to (.*)$/ do |piece, position, destination|
+  @board.move(Move.new(position, destination))
+end
+
+Then /^The (.*) (.*) is moved to (.*)$/ do |color, piece, destination|
+  @board.find_at(Coordinate.new(destination))[0].should == @rook[0][0]
+end
+Then /^The rook at (.*) is removed$/ do |destination|
+  @board.find_at(Coordinate.new(destination))[0].color.should == 'black'
 end

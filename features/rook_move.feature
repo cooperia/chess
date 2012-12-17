@@ -4,6 +4,15 @@ Feature: Move a rook from A to B with no obstructions or captures
   I want to be able to move a rook from A to B
 
 Scenario: Move rook from A to B
-  Given A Rook at A1
-  When I move the rook to B1
-  Then The rook is moved to B1
+  Given a board
+  Given A black rook at A1
+  When I move the rook from A1 to B1
+  Then The black rook is moved to B1
+
+Scenario: Perform a capture move
+  Given a board
+  Given A black rook at A1
+  Given A white rook at C1
+  When I move the rook from A1 to C1
+  Then The rook at C1 is removed
+  Then The black rook is moved to C1

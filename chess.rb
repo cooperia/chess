@@ -49,17 +49,27 @@ class Pieces
 
   def move(move)
     move_error_catcher(move)
-    vacancy?(move.destination) ? true : 'capture'
+    vacancy?(move.destination) ? true : capture = capture_error_catcher(move)
     piece = find_at(move.position)
     free_path = @move_factory.generate_move(move, piece[0].type)
     path_check?(free_path)
-    perform_move(move)
-
+    perform_move(move, capture)
   end
 
-  def perform_move(move)
+  def capture_error_catcher(move)
+    captured_piece = find_at(move.destination)[0]
+    piece = find_at(move.position)[0]
+    captured_piece.color != piece.color ? true : raise(RuntimeError, 'Can\'t capture your own pieces!')
+  end
+
+  def perform_move(move, capture = nil)
+    capture ? destroy_piece(move.destination) : true
     piece = find_at(move.position)
     update_position(piece, move.destination)
+  end
+
+  def destroy_piece(destination)
+    @collection = @collection.reject {|piece| piece[1].eql?(destination)}
   end
 
   def update_position(piece, move_destination)

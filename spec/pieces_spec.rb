@@ -21,6 +21,13 @@ describe Pieces do
     end
   end
 
+  describe '#capture_error_catcher' do
+    it 'catches if the destination is occupied by the same color' do
+      pieces.place('rook', 'black', 'B1')
+      expect { pieces.capture_error_catcher(move) }.to raise_error(RuntimeError, 'Can\'t capture your own pieces!')
+    end
+  end
+
   describe '#place_error_catcher' do
     let(:error_pieces) { Pieces.new }
     it "catches invalid position" do
@@ -47,6 +54,19 @@ describe Pieces do
     it 'returns a piece with a new position' do
       piece = pieces.perform_move(Move.new('A1', 'C1'))
       piece.eql?(Coordinate.new('C1')).should == true
+    end
+
+    it 'calls #destroy_piece if capture is true' do
+      pieces.should_receive(:destroy_piece)
+      pieces.perform_move(move, true)
+    end
+  end
+
+  describe '#destroy_piece' do
+    it 'should destroy piece at destination' do
+      pieces.place('rook', 'black', 'H8')
+      pieces.destroy_piece(Coordinate.new('H8'))
+      pieces.find_at(Coordinate.new('H8')).should == nil
     end
   end
 
