@@ -51,8 +51,19 @@ class Pieces
     move_error_catcher(move)
     vacancy?(move.destination) ? true : 'capture'
     piece = find_at(move.position)
-    @move_factory.generate_move(move, piece[0].type)
+    free_path = @move_factory.generate_move(move, piece[0].type)
+    path_check?(free_path)
+    perform_move(move)
 
+  end
+
+  def perform_move(move)
+    piece = find_at(move.position)
+    update_position(piece, move.destination)
+  end
+
+  def update_position(piece, move_destination)
+    piece[1] = move_destination
   end
 
   def path_check?(path)
@@ -143,16 +154,46 @@ class Rook
 end
 
 class RookRules
+  attr_reader :cherda
 
-  def generate_path(move)
-    moves = generate_moves(move.position)
-    if valid_move?(moves, move.destination)
-
-    else
-      raise('Invalid move for a rook')
-    end
+  def initialize
+    @cherda = 'CREATED!'
   end
 
+  #TODO: Modularify the array generation process
+  def generate_path(move)
+    moves = generate_moves(move.position)
+    !valid_move?(moves, move.destination) ? raise('Invalid move for a rook') : true
+    path_array = []
+    if move.position.x < move.destination.x
+      #new_array_calculate
+      #path_array << new_array.each
+      holder = move.position.x.next
+      while holder != move.destination.x
+        path_array.push(Coordinate.new(holder+move.position.y.to_s))
+        holder = holder.next
+      end
+    elsif move.position.x > move.destination.x
+      holder = move.destination.x.next
+      while holder != move.position.x
+        path_array.push(Coordinate.new(holder+move.position.y.to_s))
+        holder = holder.next
+      end
+    elsif move.position.y < move.destination.y
+      holder = move.position.y + 1
+      while holder != move.destination.y
+        path_array.push(Coordinate.new(move.position.x+holder.to_s))
+        holder += 1
+      end
+    elsif move.position.y > move.destination.y
+      holder = move.position.y - 1
+      while holder != move.destination.y
+        path_array.push(Coordinate.new(move.destination.x+holder.to_s))
+        holder -= 1
+      end
+    end
+      path_array
+  end
 
   def generate_moves(position)
      possible_moves = []
@@ -193,8 +234,17 @@ class Move
   attr_accessor :position, :destination
 
   def initialize(position, destination)
+    !valid?(position, destination) ? error : true
     @position = Coordinate.new(position)
     @destination = Coordinate.new(destination)
+  end
+
+  def valid?(position, destination)
+    position != destination
+  end
+
+  def error
+    raise 'Position must be different from destination'
   end
 
   def eql?(other)
@@ -206,7 +256,12 @@ end
 class MoveFactory
 
   def generate_move(move, type)
-    type = titleize(type)+'Rules'
+    rules = generate_object(type)
+    rules.generate_path(move)
+  end
+
+  def generate_object(type)
+    Object.const_get(titleize(type)+'Rules').new
   end
 
   def titleize(string)

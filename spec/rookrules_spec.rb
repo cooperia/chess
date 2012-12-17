@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'rspec'
-require '/Users/ian/chess/chess.rb'
+require '/Users/jasmina/Documents/Ruby/chess_ian/chess/chess.rb'
 require 'cucumber'
 
 describe RookRules do
@@ -8,6 +8,7 @@ describe RookRules do
 
   describe '#generate_path' do
     it 'generates a path that must be open to move a piece' do
+      move = Move.new('A1', 'A4')
       rules.generate_path(move)[0].eql?(Coordinate.new('A2')).should == true
       rules.generate_path(move)[1].eql?(Coordinate.new('A3')).should == true
     end

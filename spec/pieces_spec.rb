@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'rspec'
-require '/Users/ian/chess/chess.rb'
+require '/Users/jasmina/Documents/Ruby/chess_ian/chess/chess.rb'
 require 'cucumber'
 
 describe Pieces do
@@ -8,13 +8,16 @@ describe Pieces do
   let(:current_piece_position) {pieces.collection[0][1]}
   let(:move) {Move.new('A1', 'B1')}
 
-  before(:all) do
+  before(:each) do
     pieces.place('rook', 'black', 'A1')
+
   end
 
   describe '#move' do
     it 'performs a move and returns true or false if it was successful' do
-      pieces.move(move).should == 'RookRules'
+      a_piece = pieces.find_at(Coordinate.new('A1'))[0]
+      pieces.move(move).eql?(Coordinate.new('B1')).should == true
+      pieces.collection[0][0].should == a_piece
     end
   end
 
@@ -32,11 +35,26 @@ describe Pieces do
 
   describe '#move_error_catcher' do
     it 'catches no piece at position' do
-      expect { pieces.move_error_catcher(Move.new('B1', 'Z1'))}.to raise_error(RuntimeError, 'No piece at position')
+      expect { pieces.move_error_catcher(Move.new('B1', 'C1'))}.to raise_error(RuntimeError, 'No piece at position')
     end
 
     it 'catches invalid destination' do
       expect {pieces.move_error_catcher(Move.new('A1', 'Z1'))}.to raise_error(RuntimeError, 'Invalid Destination')
+    end
+  end
+
+  describe '#perform_move' do
+    it 'returns a piece with a new position' do
+      piece = pieces.perform_move(Move.new('A1', 'C1'))
+      piece.eql?(Coordinate.new('C1')).should == true
+    end
+  end
+
+  describe '#update_position' do
+    it 'should update a piece\'s destination' do
+      piece = pieces.collection[0]
+      pieces.update_position(piece, Coordinate.new('A4'))
+      piece[1].eql?(Coordinate.new('A4')).should == true
     end
   end
 
