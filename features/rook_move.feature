@@ -16,3 +16,11 @@ Scenario: Perform a capture move
   When I move the rook from A1 to C1
   Then The rook at C1 is removed
   Then The black rook is moved to C1
+
+Scenario: Fails to move a piece when moving path is obstructed
+  Given a board
+  Given A black rook at A1
+  Given A white rook at C1
+#  When I move the rook from A1 to D1
+  Then It should raise Path obstructed when I move the rook from A1 to D1
+

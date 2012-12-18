@@ -17,3 +17,14 @@ end
 Then /^The rook at (.*) is removed$/ do |destination|
   @board.find_at(Coordinate.new(destination))[0].color.should == 'black'
 end
+#Then /^The move is not allowed and exception is raised$/ do
+#
+#  @board.move(Move.new(position, destination)).should raise_error(RuntimeError, 'Path obstructed')
+#
+#end
+
+Then /^It should raise (.+?) when (.+)$/ do |exception, when_step|
+  lambda {
+    When when_step
+  }.should raise_error(RuntimeError, exception)
+end
