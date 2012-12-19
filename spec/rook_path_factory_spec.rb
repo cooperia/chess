@@ -44,16 +44,9 @@ describe RookPathFactory do
     end
   end
 
-  describe '#horizontal_path_array' do
+  describe '#path_array' do
     it 'returns an array of squares that must be open for a given move' do
-      path_factory.horizontal_path_array(['A1','C1'], Coordinate.new('A1')).first.equal?(Coordinate.new('B1')).should == true
+      path_factory.path_array(['A1','C1'], Coordinate.new('A1')).first.equal?(Coordinate.new('B1')).should == true
     end
   end
-
-  describe '#vertical_path_array' do
-    it 'returns an array of squares for a vertical move' do
-      path_factory.vertical_path_array(['A3', 'A8'], Coordinate.new('A3')).first.equal?(Coordinate.new('A4')).should == true
-    end
-  end
-
 end

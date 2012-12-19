@@ -10,7 +10,6 @@ class Coordinate
     coordinates = coordinates.split('')
     @x = coordinates[0]
     @y = coordinates[1].to_i
-    raise('Invalid Coordinates') unless self.legal?
   end
 
   def legal?

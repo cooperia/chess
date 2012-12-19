@@ -1,27 +1,20 @@
 class RookPathFactory
 
-  #TODO: Modularify the array generation process
-  #Direction x, Direction y (in move object)
   def generate_path(move)
     moves = generate_moves(move.position)
     raise('Invalid move for a rook') unless valid_move?(moves, move.destination)
     a_ranged = move.arranger
-    direction = move.get_direction
-    send("#{direction}_path_array", a_ranged, move.position)
+    path_array(a_ranged, move.position)
   end
 
-  def vertical_path_array(a_ranged, position)
+  def path_array(a_ranged, position)
     path_array = []
     (a_ranged.first.next...a_ranged.last).each do |entry|
       path_array.push(Coordinate.new(entry))
     end
-    path_array
-  end
-
-  def horizontal_path_array(a_ranged, position)
-    path_array = []
-    range = (a_ranged.first.slice(0,1).next...a_ranged.last.slice(0,1))
-    range.each { |entry| path_array.push(Coordinate.new(entry + position.y.to_s)) }
+    if path_array.length > 6
+      path_array = path_array.reject { |entry| !entry.legal? || position.y != entry.y }
+    end
     path_array
   end
 

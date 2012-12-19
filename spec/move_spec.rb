@@ -13,6 +13,10 @@ describe Move do
     it 'raises an error if position == destination' do
       expect{ Move.new('A1', 'A1') }.to raise_error(RuntimeError, 'Position must be different from destination')
     end
+
+    it 'should return false for invalid coordinates' do
+      expect { Move.new('A2', 'Z1')}.to raise_error(RuntimeError, 'Invalid Coordinates')
+    end
   end
 
   describe '#valid?' do
@@ -52,15 +56,27 @@ describe Move do
   describe '#arranger' do
     it 'return an array of position and destination, smallest to largest as strings' do
       backwards_move = Move.new('C1', 'A1')
-
       backwards_move.arranger.should == ['A1', 'C1']
     end
   end
 
-  describe '#get_direction' do
-    it 'returns vertical if the direction of travel is vertical' do
-      move.get_direction.should == 'horizontal'
+  #describe '#get_direction' do
+  #  it 'returns vertical if the direction of travel is vertical' do
+  #    move.get_direction.should == 'horizontal'
+  #  end
+  #end
+
+  describe '#legal?' do
+    it 'should return true for valid position and destination' do
+      move.legal?.should == true
+    end
+
+    it 'should return false for invalid position' do
+      expect { Move.new('A9', 'B4').legal? }.to raise_error(RuntimeError, 'Invalid Coordinates')
+    end
+
+    it 'should return true for valid position and destination' do
+      expect { Move.new('A3', 'X4').legal? }.to raise_error(RuntimeError, 'Invalid Coordinates')
     end
   end
-
 end
