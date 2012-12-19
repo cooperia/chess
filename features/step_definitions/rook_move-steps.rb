@@ -1,5 +1,6 @@
 Given /^a board$/ do
   @board = Pieces.new
+  @game = Game.new(@board)
   @rook = []
 end
 
@@ -8,14 +9,14 @@ Given /^A (.*) (.*) at (.*)$/ do |color, piece, position|
 end
 
 When /^I move the (.*) from (.*) to (.*)$/ do |piece, position, destination|
-  @board.move(Move.new(position, destination))
+  @game.move(position, destination)
 end
 
 Then /^The (.*) (.*) is moved to (.*)$/ do |color, piece, destination|
-  @board.find_at(Coordinate.new(destination))[0].should == @rook[0][0]
+  @board.find_at(Coordinate.new(destination)).should == @rook[0]
 end
 Then /^The rook at (.*) is removed$/ do |destination|
-  @board.find_at(Coordinate.new(destination))[0].color.should == 'black'
+  @board.find_at(Coordinate.new(destination)).color.should == 'black'
 end
 
 Then /^It should raise (.+?) when (.+)$/ do |exception, when_step|

@@ -31,7 +31,7 @@ Scenario: Fails to move a rook because destination is not legal for a rook
 Scenario: Fails to move a piece because destination is not on the board
   Given a board
   Given A black rook at A1
-  Then It should raise Invalid Destination when I move the rook from A1 to Z1
+  Then It should raise Invalid Coordinates when I move the rook from A1 to Z1
 
 Scenario: Fails to move a piece because destination is not on the board
   Given a board
