@@ -3,6 +3,7 @@ class Coordinate
   MAX_ROW = 8
   MIN_COL = 'A'
   MAX_COL = 'H'
+  LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
   attr_accessor :x, :y
 
@@ -22,5 +23,14 @@ class Coordinate
 
   def stringify
     x.to_s + y.to_s
+  end
+
+  def delta_x(unit)
+    delta = LETTERS.index(x) + unit
+    if delta >= 0
+      LETTERS[delta]
+    else
+      'Z'
+    end
   end
 end

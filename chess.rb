@@ -5,5 +5,6 @@ require dir + '/lib/piece.rb'
 require dir + '/lib/coordinate.rb'
 require dir + '/lib/move.rb'
 require dir + '/lib/rook_path_factory.rb'
+require dir + '/lib/knight_path_factory.rb'
 
 #Game.new(Pieces.new)

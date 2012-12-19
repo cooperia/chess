@@ -1,5 +1,6 @@
 class RookPathFactory
 
+  #module candidate
   def generate_path(move)
     moves = generate_moves(move.position)
     raise('Invalid move for a rook') unless valid_move?(moves, move.destination)
@@ -29,7 +30,8 @@ class RookPathFactory
     possible_moves = possible_moves.reject{ |allowed| allowed.equal?(position) }
   end
 
+  #module candidate
   def valid_move?(valid_moves, destination)
-    valid_moves.find { |move| move.equal?(destination)} ? true : false
+    valid_moves.any? { |move| move.equal?(destination)}
   end
 end
