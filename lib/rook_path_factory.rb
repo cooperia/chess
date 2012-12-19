@@ -1,6 +1,5 @@
 class RookPathFactory
 
-  #module candidate
   def generate_path(move)
     moves = generate_moves(move.position)
     raise('Invalid move for a rook') unless valid_move?(moves, move.destination)

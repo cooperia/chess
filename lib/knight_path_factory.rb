@@ -1,4 +1,5 @@
 class KnightPathFactory
+
   def generate_path(move)
     moves = generate_moves(move.position)
     raise('Invalid move for a knight') unless valid_move?(moves, move.destination)
@@ -7,15 +8,11 @@ class KnightPathFactory
 
   def generate_moves(position)
     possible_moves = []
-    possible_moves.push(Coordinate.new(position.delta_x(-1) + (position.y+2).to_s))
-    possible_moves.push(Coordinate.new(position.delta_x(-1) + (position.y-2).to_s))
-    possible_moves.push(Coordinate.new(position.delta_x(-2) + (position.y+1).to_s))
-    possible_moves.push(Coordinate.new(position.delta_x(-2) + (position.y-1).to_s))
-    possible_moves.push(Coordinate.new(position.delta_x(+1) + (position.y+2).to_s))
-    possible_moves.push(Coordinate.new(position.delta_x(+1) + (position.y-2).to_s))
-    possible_moves.push(Coordinate.new(position.delta_x(+2) + (position.y+1).to_s))
-    possible_moves.push(Coordinate.new(position.delta_x(+2) + (position.y-1).to_s))
+    move_deltas = [[-1, 2], [-1, -2], [-2, 1], [-2, -1], [1, 2], [1, -2], [2, 1], [2, -1]]
 
+    move_deltas.each do |delta|
+      possible_moves.push(Coordinate.new(position.delta_x(delta[0]) + (position.y + delta[1]).to_s))
+    end
     possible_moves = possible_moves.reject {|entry| !entry.legal? }
   end
 
