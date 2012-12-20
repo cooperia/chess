@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe RookMove do
-  let(:rook_move) {RookMove.new}
+describe PossibleMoves do
+  let(:rook_move) {PossibleMoves.new}
 
   describe '#add' do
     it 'adds a coordinate to the list of possible options' do

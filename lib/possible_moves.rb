@@ -1,4 +1,4 @@
-class RookMove
+class PossibleMoves
   attr_reader :move_options
 
   def initialize
