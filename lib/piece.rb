@@ -11,13 +11,12 @@ class Piece
     self.position = new_position
   end
 
-  def generate_allowed_path(move)
-    path_factory = generate_path_factory
-    path_factory.generate_path(move)
+  def generate_move
+    Object.const_get(titleize(type) +'MoveGenerator').generate(position)
   end
 
-  def generate_path_factory()
-    Object.const_get(titleize(type) +'PathFactory').new
+  def generate_path(move)
+    Object.const_get(titleize(type) + 'PathGenerator').generate(move)
   end
 
   def titleize(string)

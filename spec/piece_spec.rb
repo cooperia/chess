@@ -1,8 +1,20 @@
 require 'spec_helper'
 
-describe Pieces do
+describe Piece do
   let(:piece){Piece.new('rook', 'black', 'A1')}
-  let(:move) { Move.new('A1', 'A4') }
+  let(:move) { Move.new('A1', 'A4', Pieces.new) }
+
+  describe '#generate_move' do
+    it 'generates possible moves using the piece\'s type' do
+     piece.generate_move.is_a?(RookMove).should == true
+    end
+  end
+
+  describe '#generate_path' do
+    it 'generates a path using the piece\'s type' do
+      piece.generate_path(move).is_a?(Path).should == true
+    end
+  end
 
   describe '#new' do
     it 'creates a new piece' do
@@ -16,20 +28,6 @@ describe Pieces do
     it 'sets a new position for instance' do
       piece.set_position(Coordinate.new('A3'))
       piece.position.equal?(Coordinate.new('A3')).should == true
-    end
-  end
-
-  describe '#generate_allowed_path' do
-    it "generates a move using the appropriate set of rules based on a piece's type" do
-      RookPathFactory.any_instance.should_receive(:generate_path)
-      piece.generate_allowed_path(move)
-    end
-  end
-
-  describe '#generate_path_factory' do
-    it 'generates an instance of the appropriate rules object' do
-      object = piece.generate_path_factory
-      object.is_a?(RookPathFactory).should == true
     end
   end
 
