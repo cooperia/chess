@@ -1,70 +1,160 @@
 require 'spec_helper'
 
 describe Move do
-  let(:move) { Move.new('A1', 'B1') }
-  let(:pieces) { Pieces.new }
+  let(:board) { Board.new }
+  let(:move) { Move.new('A1', 'B1', board) }
+  let(:piece) { Piece.new('rook', 'black', 'A1') }
+
+  before do
+    board.stub(:find_at).and_return(piece)
+  end
 
   describe '#new' do
     it 'creates a new move instance with valid coordinates' do
-      move.position.x.should == 'A'
-      move.position.y.should == 1
+      move.origin.x.should == 'A'
+      move.origin.y.should == 1
     end
 
-    it 'raises an error if position == destination' do
-      expect{ Move.new('A1', 'A1') }.to raise_error(RuntimeError, 'Position must be different from destination')
+    context 'if position == destination' do
+      it 'raises an error' do
+        expect{ Move.new('A1', 'A1', board) }.to raise_error(RuntimeError, 'Position must be different from destination')
+      end
     end
 
-    it 'should return false for invalid coordinates' do
-      expect { Move.new('A2', 'Z1')}.to raise_error(RuntimeError, 'Invalid Coordinates')
+    context 'if coordinates are invalid' do
+      it 'raise an error' do
+        expect { Move.new('A2', 'Z1', board)}.to raise_error(RuntimeError, 'Invalid Coordinates')
+      end
     end
   end
 
   describe '#valid?' do
-    it 'returns false if move and destination are the same' do
-      move.valid?('A1', 'A1').should == false
+    context 'if coordinates are different' do
+      it 'returns true' do
+        move.valid?.should == true
+      end
     end
   end
 
-  describe '#error' do
-    it 'raises error' do
-      expect{ move.error }.to raise_error(RuntimeError, 'Position must be different from destination')
+  describe "#perform" do
+    before do
+      move.stub(:verify_move).and_return(true)
+      move.stub(:verify_path?).and_return(true)
+      move.stub(:complete).and_return(true)
+    end
+
+    it 'should call verify move' do
+      move.should_receive(:verify_move)
+      move.perform
+    end
+
+    context 'if verify path returns false' do
+      before do
+        move.stub(:verify_path?).and_return(false)
+      end
+      it 'doesnt complete the move' do
+        move.should_not_receive(:complete)
+        move.perform
+      end
+    end
+
+    context 'if verify path returns true' do
+      it 'completes the move' do
+        move.should_receive(:complete)
+        move.perform
+      end
+    end
+  end
+
+  describe "#complete" do
+    it ' should call capture_at on board' do
+      board.should_receive(:capture_at).with(move.destination).and_return(true)
+      piece.should_receive(:set_position).with(move.destination).and_return(true)
+      move.complete(piece)
+    end
+  end
+
+  describe '#verify_move' do
+    let(:possible_moves_double) {double(PossibleMoves)}
+    before do
+      piece.stub(:generate_move).and_return(possible_moves_double)
+      possible_moves_double.stub(:includes?).and_return(true)
+    end
+
+    it 'asks pieces to generate a move and asks that move if it includes the destination' do
+      piece.should_receive(:generate_move).and_return(possible_moves_double)
+      possible_moves_double.should_receive(:includes?).and_return(true)
+      move.verify_move
+    end
+
+    context 'if includes? returns true' do
+      it 'returns true' do
+        move.verify_move.should == true
+      end
+    end
+
+    context 'otherwise, an exception will be raised' do
+
+    end
+  end
+
+  describe '#verify_path?' do
+    let(:path_double) {double(Path)}
+    before do
+      piece.stub(:generate_path).and_return(path_double)
+      path_double.stub(:obstructed?).and_return(true)
+    end
+    it 'should ask piece to generate a path and ask the path if it is obstructed' do
+      piece.should_receive(:generate_path).with(move)
+      move.verify_path?
+    end
+    context 'if the path is unobstructed' do
+      it 'will return true' do
+        move.verify_path?.should == true
+      end
+    end
+
+    context 'if the path is obstructed' do
+      it 'will do nothing but an exception will be raised elsewhere' do
+
+      end
+    end
+
+
+  end
+
+  describe '#errors' do
+    context 'if valid? is false' do
+      it 'calls an error method' do
+        move.stub(:legal?).and_return(true)
+        move.stub(:valid?).and_return(false)
+        expect{ move.errors }.to raise_error(RuntimeError, 'Position must be different from destination')
+      end
+    end
+    context 'if legal? is false' do
+      it 'calls an error method' do
+        move.stub(:legal?).and_return(false)
+        move.stub(:valid?).and_return(true)
+        expect{ move.errors }.to raise_error(RuntimeError, 'Invalid Coordinates')
+      end
     end
   end
 
   describe 'equal' do
-    it 'returns true if two objects coordinates are equal' do
-      new_object = Move.new('A1', 'B1')
-      new_object.equal?(move).should == true
+    context 'if object\'s coordinates are equal' do
+      it 'returns true' do
+        new_object = Move.new('A1', 'B1', board)
+        new_object.equal?(move).should == true
+      end
     end
 
-    it 'returns false if two objects coordinates are not equal' do
-      new_object = Move.new('A3', 'B3')
-      new_object.equal?(move).should == false
-    end
-  end
-
-  describe '#move' do
-    it 'should call move methods' do
-      piece = Piece.new('rook','black','A1')
-      pieces.stub(:get_moving_piece).with(move).and_return(piece)
-      piece.should_receive(:generate_allowed_path)
-      pieces.should_receive(:complete_move)
-      move.move(pieces)
+    context 'if object\'s coordinates are not equal' do
+      it 'returns false if two objects coordinates are not equal' do
+        new_object = Move.new('A3', 'B3', board)
+        new_object.equal?(move).should == false
+      end
     end
   end
-
-  describe '#arranger' do
-    it 'return an array of position and destination, smallest to largest as strings' do
-      backwards_move = Move.new('C1', 'A1')
-      backwards_move.arranger.should == ['A1', 'C1']
-    end
-  end
-
-  #describe '#get_direction' do
-  #  it 'returns vertical if the direction of travel is vertical' do
-  #    move.get_direction.should == 'horizontal'
-  #  end
-  #end
 
   describe '#legal?' do
     it 'should return true for valid position and destination' do
@@ -72,11 +162,11 @@ describe Move do
     end
 
     it 'should return false for invalid position' do
-      expect { Move.new('A9', 'B4').legal? }.to raise_error(RuntimeError, 'Invalid Coordinates')
+      expect { Move.new('A9', 'B4', board).legal? }.to raise_error(RuntimeError, 'Invalid Coordinates')
     end
 
     it 'should return true for valid position and destination' do
-      expect { Move.new('A3', 'X4').legal? }.to raise_error(RuntimeError, 'Invalid Coordinates')
+      expect { Move.new('A3', 'X4', board).legal? }.to raise_error(RuntimeError, 'Invalid Coordinates')
     end
   end
 end

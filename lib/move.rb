@@ -1,39 +1,56 @@
 class Move
-  attr_accessor :position, :destination
+  attr_accessor :origin, :destination, :piece, :board
 
-  def initialize(position, destination)
-    raise error unless valid?(position, destination)
-    @position = Coordinate.new(position)
+  def initialize(origin, destination, board)
+    @origin = Coordinate.new(origin)
+    @board = board
     @destination = Coordinate.new(destination)
-    raise 'Invalid Coordinates' unless self.legal?
+    @piece = board.find_at(origin)
+    errors
   end
 
-  #?
-  def move(pieces)
-    piece = pieces.get_moving_piece(self)
-    path = piece.generate_allowed_path(self)
-    pieces.complete_move(piece, path, self)
-    #Are we passing way too much? Or should we continue asking pieces
-    #questions until we know exactly what is going on.
+  def perform
+    verify_move
+    complete(piece) if verify_path?
   end
 
-  def valid?(position, destination)
-    position != destination
+  def verify_path?
+    path = piece.generate_path(self)
+    path.obstructed?(board)
   end
 
-  def error
+  def verify_move
+    possible_moves = piece.generate_move
+    possible_moves.includes?(destination)
+  end
+
+  def complete(piece)
+    board.capture_at(destination)
+    piece.set_position(destination)
+  end
+
+  def valid?
+    !origin.equal?(destination)
+  end
+
+  def errors
+    raise_unless_coordinates_are_legal unless legal?
+    raise_if_origin_equals_destination unless valid?
+  end
+
+  def raise_unless_coordinates_are_legal
+    raise 'Invalid Coordinates'
+  end
+
+  def raise_if_origin_equals_destination
     raise 'Position must be different from destination'
   end
 
   def equal?(move_object)
-    move_object.position.equal?(position) && move_object.destination.equal?(destination)
+    move_object.origin.equal?(origin) && move_object.destination.equal?(destination)
   end
 
   def legal?
-    @position.legal? && @destination.legal?
-  end
-
-  def arranger
-    [position.stringify, destination.stringify].sort
+    origin.legal? && destination.legal?
   end
 end

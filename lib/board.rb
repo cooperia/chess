@@ -1,4 +1,4 @@
-class Pieces
+class Board
   attr_accessor :collection
 
   def initialize
@@ -11,7 +11,7 @@ class Pieces
   end
 
   def complete_move(piece, path, move)
-    path_check?(path)
+    obstructed?(path)
     move_type = check_move_type(move)
     send("complete_#{move_type}_move", piece, move)
   end
@@ -31,11 +31,11 @@ class Pieces
     complete_regular_move(piece, move)
   end
 
-  def destroy_piece(destination)
+  def remove_piece(destination)
     self.collection = collection.reject { |piece| piece.position.equal?(destination) }
   end
 
-  def path_check?(path)
+  def obstructed?(path)
     path.each do |position|
       raise('Path obstructed') unless vacancy?(position)
     end
@@ -46,11 +46,6 @@ class Pieces
     vacancy?(move.destination) ? nil : capture_error_catcher(move)
   end
 
-  def prepare_move(move)
-    piece = find_at(move.position)
-    required_path = @move_factory.generate_move(move, piece[0].type)
-    path_check?(required_path)
-  end
 
   def place(type, color, position)
     place_error_catcher(Coordinate.new(position))
