@@ -17,7 +17,11 @@ class PossibleMoves
     move_options.any? { |move| move.equal?(destination)}
   end
 
-  def reject(arg)
+  def remove(arg)
     @move_options = move_options.reject { |option| option.equal?(arg) }
+  end
+
+  def clean
+    @move_options = move_options.reject { |entry| !entry.legal? }
   end
 end

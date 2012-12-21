@@ -7,7 +7,7 @@ class RookMoveGenerator
       possible_moves.add(Coordinate.new(letter + origin.y.to_s))
       letter = letter.next
     end
-    possible_moves.reject(origin)
+    possible_moves.remove(origin)
     possible_moves
   end
 end
