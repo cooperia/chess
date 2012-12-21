@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe Piece do
   let(:piece){Piece.new('rook', 'black', 'A1')}
-  let(:move) { Move.new('A1', 'A4', Pieces.new) }
+  let(:move) { Move.new('A1', 'A4', Board.new) }
 
   describe '#generate_move' do
     it 'generates possible moves using the piece\'s type' do
-     piece.generate_move.is_a?(RookMove).should == true
+     piece.generate_move.is_a?(PossibleMoves).should == true
     end
   end
 

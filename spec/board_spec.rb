@@ -1,13 +1,33 @@
 require 'spec_helper'
 
-describe Pieces do
-  let(:pieces) { Pieces.new }
-  let(:current_piece_position) {pieces.collection[0][1]}
-  let(:move) {Move.new('A1', 'B1')}
+describe Board do
+  let(:board) { Board.new }
+  let(:move) {Move.new('A1', 'B1', board)}
 
   before(:each) do
-     pieces.place('rook', 'black', 'A1')
+     board.place('rook', 'black', 'A1')
   end
+
+  describe '#find_at' do
+    it 'finds a piece by its position' do
+      board.find_at(Coordinate.new('A1')).type.should == 'rook'
+    end
+  end
+
+  describe '#capture_at' do
+    let(:piece) {board.find_at(Coordinate.new('A1'))}
+    it 'should call capture_errors' do
+      board.should_receive(:capture_errors).with(piece).and_return(true)
+      board.capture_at(move.destination, piece)
+    end
+  end
+
+
+
+
+
+
+
 
   describe '#place' do
     it 'positions a piece' do
@@ -87,7 +107,7 @@ describe Pieces do
   end
 
   describe '#place_error_catcher' do
-    let(:error_pieces) { Pieces.new }
+    let(:error_pieces) { Board.new }
 
     it 'catches an occupied destination' do
       error_pieces.place('rook', 'black', 'A1')
@@ -111,21 +131,37 @@ describe Pieces do
     end
   end
 
-  describe '#path_check?' do
-    it 'returns false if a path is obstructed' do
-      expect { pieces.path_check?([Coordinate.new('A1'), Coordinate.new('A2')])}.to raise_error(RuntimeError, 'Path obstructed')
+  describe "#obstructed" do
+
+    context "if the path is obstructed" do
+
+      before do
+        pieces.should_receive(:vacancy?).and_return(false)
+      end
+
+      it "it should return true" do
+
+      end
     end
 
-    it 'returns true if path is unobstructed' do
-      pieces.path_check?([Coordinate.new('A2'), Coordinate.new('A3')]).should == true
+    context "if the path is NOT obstructed" do
+      it "should return false" do
+
+      end
     end
   end
 
-  describe '#find_at' do
-    it 'finds a piece by its position' do
-      pieces.find_at(Coordinate.new('A1')).type.should == 'rook'
-    end
-  end
+  #describe '#path_check?' do
+  #  it 'returns false if a path is obstructed' do
+  #    expect { pieces.path_check?([Coordinate.new('A1'), Coordinate.new('A2')])}.to raise_error(RuntimeError, 'Path obstructed')
+  #  end
+  #
+  #  it 'returns true if path is unobstructed' do
+  #    pieces.path_check?([Coordinate.new('A2'), Coordinate.new('A3')]).should == true
+  #  end
+  #end
+
+
 
   describe '#vacancy?' do
     it 'checks the vacancy of a destination' do

@@ -5,6 +5,20 @@ class Board
     @collection = []
   end
 
+  def find_at(position)
+    collection.find {|piece| piece.position.equal?(position)}
+  end
+
+  def capture_at(destination, piece)
+    capture_errors(piece)
+  end
+
+  def capture_errors(piece)
+
+  end
+
+
+
   def get_moving_piece(move)
     raise('No piece at position') unless find_at(move.position)
     find_at(move.position)
@@ -56,9 +70,7 @@ class Board
     piece.set_position(move_destination)
   end
 
-  def find_at(position)
-    collection.find {|piece| piece.position.equal?(position)}
-  end
+
 
   #TODO:Possibly move all errors into an error class and pass self and state
   def place_error_catcher(position)

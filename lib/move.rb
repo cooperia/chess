@@ -5,7 +5,8 @@ class Move
     @origin = Coordinate.new(origin)
     @board = board
     @destination = Coordinate.new(destination)
-    @piece = board.find_at(origin)
+    #be sure to account for no piece at origin
+    @piece = board.find_at(@origin)
     errors
   end
 
@@ -25,7 +26,7 @@ class Move
   end
 
   def complete(piece)
-    board.capture_at(destination)
+    board.capture_at(destination, piece)
     piece.set_position(destination)
   end
 

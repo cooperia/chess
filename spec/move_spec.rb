@@ -68,7 +68,7 @@ describe Move do
 
   describe "#complete" do
     it ' should call capture_at on board' do
-      board.should_receive(:capture_at).with(move.destination).and_return(true)
+      board.should_receive(:capture_at).with(move.destination, piece).and_return(true)
       piece.should_receive(:set_position).with(move.destination).and_return(true)
       move.complete(piece)
     end
