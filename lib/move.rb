@@ -17,12 +17,12 @@ class Move
 
   def verify_path?
     path = piece.generate_path(self)
-    path.obstructed?(board)
+    path.obstructed?(board.collection)
   end
 
   def verify_move
     possible_moves = piece.generate_move
-    possible_moves.includes?(destination)
+    possible_moves.includes?(destination, piece.type)
   end
 
   def complete(piece)
@@ -37,6 +37,11 @@ class Move
   def errors
     raise_unless_coordinates_are_legal unless legal?
     raise_if_origin_equals_destination unless valid?
+    raise_if_piece_is_nil unless piece.is_a?(Piece)
+  end
+
+  def raise_if_piece_is_nil
+    raise 'No piece at position'
   end
 
   def raise_unless_coordinates_are_legal

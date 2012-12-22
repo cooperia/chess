@@ -11,7 +11,7 @@ class Path
 
   def obstructed?(board)
     requirements.each do |requirement|
-      raise('Path Obstructed') if board.any? {|piece| piece.position.equal?(requirement)}
+      raise('Path obstructed') if board.any? {|piece| piece.position.equal?(requirement)}
     end
   end
 

@@ -39,7 +39,7 @@ describe Path do
       board = [Piece.new('rook', 'black', 'A1'), Piece.new('rook', 'black', 'B2')]
       path.add(Coordinate.new('A1'))
       path.add(Coordinate.new('A2'))
-      expect {path.obstructed?(board)}.to raise_error(RuntimeError, 'Path Obstructed')
+      expect {path.obstructed?(board)}.to raise_error(RuntimeError, 'Path obstructed')
     end
   end
 

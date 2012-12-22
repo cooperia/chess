@@ -9,8 +9,8 @@ class PossibleMoves
    move_options.push(coordinate)
   end
 
-  def includes?(destination)
-    raise('Invalid move for a rook') unless valid_move?(destination)
+  def includes?(destination, type)
+    raise("Invalid move for a #{type}") unless valid_move?(destination)
   end
 
   def valid_move?(destination)

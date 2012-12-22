@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Piece do
+  let(:board){Board.new}
   let(:piece){Piece.new('rook', 'black', 'A1')}
-  let(:move) { Move.new('A1', 'A4', Board.new) }
+  let(:move) { Move.new('A1', 'A4', board) }
 
   describe '#generate_move' do
     it 'generates possible moves using the piece\'s type' do
@@ -11,6 +12,9 @@ describe Piece do
   end
 
   describe '#generate_path' do
+    before do
+      board.place('rook','black','A1')
+    end
     it 'generates a path using the piece\'s type' do
       piece.generate_path(move).is_a?(Path).should == true
     end

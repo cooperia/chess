@@ -5,6 +5,10 @@ describe RookPathGenerator do
   let(:vertical_move) { Move.new('A1', 'A4', pieces) }
   let(:path_double) { double("Path Object") }
 
+  before do
+    pieces.place('rook', 'black', 'A1')
+  end
+
   describe '#generate' do
     it 'generates a path that must be open to move a piece' do
       path = RookPathGenerator.generate(vertical_move)

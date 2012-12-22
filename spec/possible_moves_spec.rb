@@ -14,7 +14,7 @@ describe PossibleMoves do
   describe '#includes?' do
     it 'should raise error in destination is not included in move_options' do
       possible_move.add(Coordinate.new('A1'))
-      expect { possible_move.includes?(Coordinate.new('A3')) }.to raise_error(RuntimeError, 'Invalid move for a rook')
+      expect { possible_move.includes?(Coordinate.new('A3'), 'rook') }.to raise_error(RuntimeError, 'Invalid move for a rook')
     end
   end
 
