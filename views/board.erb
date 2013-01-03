@@ -1,0 +1,47 @@
+<style type="text/css">
+    td {
+        height: 50px;
+        width: 50px;
+        border: 1px solid #000;
+        text-align: center;
+    }
+
+    td.label {
+        border: 0;
+
+    }
+
+    div {
+        width: 50%;
+        margin: auto;
+    }
+
+    h1 {
+        width: 38%;
+        margin: auto;
+    }
+</style>
+
+
+<div>
+  <h1>CHESS BOARD</h1> <br/>
+
+    <table id="chessBoard">
+      <% number = 8  %>
+      <% greeting.each do |row| %>
+            <tr>
+              <td class="label"><%= number %></td>
+              <% row.each do |cell| %>
+                <td><%= cell %></td>
+              <% end %>
+              <% number -= 1 %>
+            </tr>
+        <% end %>
+      <tr>
+        <td class="label"></td>
+        <% ("A".."H").each do |letter| %>
+            <td class="label"><%=  letter %></td>
+        <% end  %>
+      </tr>
+    </table>
+</div>

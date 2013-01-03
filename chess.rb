@@ -10,6 +10,10 @@ require dir + '/lib/possible_moves.rb'
 require dir + '/lib/path.rb'
 require dir + '/lib/knight_move_generator.rb'
 require dir + '/lib/knight_path_generator.rb'
+require 'sinatra'
 
+new_game = Game.new(Board.new).print_web_board
 
-#Game.new(Board.new)
+get '/new' do
+  erb :board, :locals => {:greeting => new_game}
+end

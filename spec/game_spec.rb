@@ -15,9 +15,9 @@ describe Game do
     end
   end
 
-  describe '#print' do
+  describe '#print_board' do
     it 'should print an empty board' do
-      game.print.should == " 8 [    ][    ][    ][    ][    ][    ][    ][    ]\n 7 [    ][    ][    ][    ][    ][    ][    ][    ]\n 6 [    ][    ][    ][    ][    ][    ][    ][    ]\n 5 [    ][    ][    ][    ][    ][    ][    ][    ]\n 4 [    ][    ][    ][    ][    ][    ][    ][    ]\n 3 [    ][    ][    ][    ][    ][    ][    ][    ]\n 2 [    ][    ][    ][    ][    ][    ][    ][    ]\n 1 [    ][    ][    ][    ][    ][    ][    ][    ]\n ___  A __  B __  C __  D __  E __  F __  G __  H _\n"
+      game.print_board.should == " 8 [    ][    ][    ][    ][    ][    ][    ][    ]\n 7 [    ][    ][    ][    ][    ][    ][    ][    ]\n 6 [    ][    ][    ][    ][    ][    ][    ][    ]\n 5 [    ][    ][    ][    ][    ][    ][    ][    ]\n 4 [    ][    ][    ][    ][    ][    ][    ][    ]\n 3 [    ][    ][    ][    ][    ][    ][    ][    ]\n 2 [    ][    ][    ][    ][    ][    ][    ][    ]\n 1 [    ][    ][    ][    ][    ][    ][    ][    ]\n ___  A __  B __  C __  D __  E __  F __  G __  H _\n"
     end
   end
 end
